@@ -1,4 +1,19 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+# frontend
+node_modules/
+build/
+dist/
+.env
+
+#server
+server/node_modules/
+server/.env
+server/data/contact.json
+
+#OS/ editor files
+.vscode/
+.DS_Store
+Thumbs.db
 
 # dependencies
 /node_modules
