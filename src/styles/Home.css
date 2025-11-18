@@ -52,7 +52,7 @@
   transform: translateY(-2px);
 }
 
-/* ====== HOME BOTTOM (Updated) ====== */
+
 .home-bottom {
   background: linear-gradient(to bottom, #ffffff, #f8f8f8);
   padding: 80px 20px;
@@ -90,13 +90,12 @@
   letter-spacing: 0.5px;
 }
 
-/* Hover accent effect */
 .home-bottom:hover h2 {
   color: #f57c00;
   transition: color 0.4s ease;
 }
 
-/* ====== RESPONSIVE ====== */
+
 @media (max-width: 768px) {
   .overlay h1 {
     font-size: 1.6rem;

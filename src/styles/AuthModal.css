@@ -95,7 +95,7 @@ input {
   margin: 4px 0;
 }
 
-/* Mobile */
+
 @media (max-width: 480px) {
   .auth-modal { padding: 24px; }
   .tabs button { padding: 8px; }

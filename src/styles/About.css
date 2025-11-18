@@ -33,7 +33,6 @@
   line-height: 1.6;
 }
 
-/* 📱 Responsive Design */
 @media (max-width: 768px) {
   .about-overlay {
     padding: 30px 20px;

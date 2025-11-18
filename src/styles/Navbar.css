@@ -12,7 +12,6 @@
   z-index: 1000;
 }
 
-/* ====== NAVLINKS CONTAINER ====== */
 .navlinks {
   display: flex;
   flex-direction: row;
@@ -35,7 +34,7 @@
   transform: translateY(-2px);
 }
 
-/* ====== LOGO ====== */
+
 .navlinks img {
   height: 95px;
   padding-top: 5px;
@@ -44,7 +43,6 @@
   object-fit: cover;
 }
 
-/* ====== LOGIN/SIGNUP BUTTON ====== */
 .authtoggleBtn {
   background-color: white;
   color: rgb(26, 7, 1);
@@ -64,7 +62,7 @@
   transform: scale(1.05);
 }
 
-/* ====== 🛒 CART BUTTON ====== */
+
 .cart-btn {
   display: flex;
   justify-content: center;
@@ -94,7 +92,6 @@
   color: white;
 }
 
-/* ====== RESPONSIVE DESIGN ====== */
 @media (max-width: 768px) {
   .navlinks {
     flex-wrap: wrap;

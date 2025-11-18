@@ -5,6 +5,9 @@ The platform showcases a food menu, ordering interface, contact page, and clean 
 
 This project focuses on frontend functionality only, built with React, components, routing, and responsive UI.
 
+## Live Demo:
+The Website is fully deployed and accessible here:
+https://geobites.vercel.app/
 
 ##  Features:
 ###  Fully Responsive UI  
@@ -36,7 +39,7 @@ Works on mobile, tablet, and desktop.
 
 ---
 
-## Project Structure
+## Project Structure:
 geobites/
 │
 ├── src/
@@ -49,7 +52,8 @@ geobites/
 │   └── index.js
 │
 └── README.md
-##  How to Run the Project
+
+##  How to Run the Project:
 
 1. Clone the repository:
    git clone https://github.com/Gs-Md/geobites
@@ -63,7 +67,7 @@ geobites/
 The project will run on:
 http://localhost:3000
 
-##  Screenshots
+##  Screenshots:
 
 ### Home Page
 ![Home](./screenshots/home.png)

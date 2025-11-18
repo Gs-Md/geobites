@@ -6,16 +6,15 @@ import About from "./pages/About";
 import Menu from "./pages/Menu";
 import Order from "./pages/Order";
 import Contact from "./pages/Contact";
-import Inbox from "./pages/Inbox"; // NEW
+import Inbox from "./pages/Inbox"; 
 import "./styles/App.css";
 import { useEffect, useState } from "react";
 
 function App() {
-  const [cart, setCart] = useState([]); // [{id,name,price,img,qty}]
+  const [cart, setCart] = useState([]); 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isOwner, setIsOwner] = useState(false);
 
-  // Check session on load
   useEffect(() => {
     fetch("http://localhost:4000/api/auth/me", {
       credentials: "include",
@@ -94,7 +93,6 @@ function App() {
               }
             />
             <Route path="/contact" element={<Contact />} />
-            {/* Owner-only inbox (route exists; Navbar shows link only if owner) */}
             <Route path="/inbox" element={<Inbox />} />
           </Routes>
         </div>

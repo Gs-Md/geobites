@@ -7,7 +7,6 @@ const Order = ({ cart, incQty, decQty, removeItem }) => {
   return (
     <div className="order-background">
       {" "}
-      {/* ✅ background wrapper */}
       <div className="order-page">
         <h1 className="order-title">🛒 Your Order</h1>
 

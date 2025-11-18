@@ -11,7 +11,7 @@
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  padding-top: 100px; /* space for navbar */
+  padding-top: 100px; 
 }
 .order-page {
     margin-top: 100px;
@@ -37,7 +37,7 @@
 
 }
 
-/* Cart List */
+
 .cart-list {
     display: flex;
     flex-direction: column;
@@ -45,7 +45,6 @@
     margin-bottom: 25px;
 }
 
-/* Card */
 .cart-card {
     display: grid;
     grid-template-columns: 80px 1fr auto auto auto;
@@ -164,7 +163,6 @@
     background-color: #e86b00;
 }
 
-/* Responsive */
 @media (max-width: 768px) {
     .cart-card {
         grid-template-columns: 70px 1fr auto auto;

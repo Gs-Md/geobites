@@ -40,7 +40,6 @@ const Navbar = ({ cartCount = 0, isLoggedIn, setIsLoggedIn, isOwner, setIsOwner 
           <Link to="/menu">Menu</Link>
           <Link to="/order">Order</Link>
 
-          {/* Owner-only page to receive Contact messages */}
           {!isOwner && <Link to="/Contact">Contact</Link>}
 
           {isOwner && <Link to="/Inbox">Messages</Link>}
