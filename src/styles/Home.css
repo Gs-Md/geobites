@@ -1,0 +1,130 @@
+.home {
+  width: 100%;
+  min-height: 100vh;
+}
+
+.home-top {
+  height: 80vh;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.overlay {
+  background-color: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  padding: 60px;
+  border-radius: 10px;
+  text-align: center;
+  max-width: 700px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.overlay h1 {
+  font-size: 2.8rem;
+  margin-bottom: 15px;
+  letter-spacing: 1px;
+}
+
+.overlay p {
+  font-size: 1.2rem;
+  margin-bottom: 25px;
+  line-height: 1.6;
+  opacity: 0.95;
+}
+
+.btn {
+  background-color: rgb(139, 0, 0);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+.btn:hover {
+  background-color: rgb(255, 0, 0);
+  transform: translateY(-2px);
+}
+
+/* ====== HOME BOTTOM (Updated) ====== */
+.home-bottom {
+  background: linear-gradient(to bottom, #ffffff, #f8f8f8);
+  padding: 80px 20px;
+  text-align: center;
+  border-top: 2px solid rgba(0, 0, 0, 0.05);
+  box-shadow: inset 0 5px 10px rgba(0, 0, 0, 0.03);
+}
+
+.home-bottom h2 {
+  font-size: 2.2rem;
+  color: rgb(26, 7, 1);
+  margin-bottom: 25px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  position: relative;
+}
+
+.home-bottom h2::after {
+  content: "";
+  display: block;
+  width: 80px;
+  height: 4px;
+  background: #f57c00;
+  margin: 12px auto 0;
+  border-radius: 2px;
+}
+
+.home-bottom p {
+  font-size: 1.3rem;
+  color: #333;
+  max-width: 700px;
+  margin: 30px auto 0;
+  line-height: 1.7;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+/* Hover accent effect */
+.home-bottom:hover h2 {
+  color: #f57c00;
+  transition: color 0.4s ease;
+}
+
+/* ====== RESPONSIVE ====== */
+@media (max-width: 768px) {
+  .overlay h1 {
+    font-size: 1.6rem;
+  }
+
+  .overlay p {
+    font-size: 1rem;
+  }
+
+  .home-top {
+    height: 55vh;
+    margin-top: 0;
+    padding-top: 0;
+  }
+
+  .overlay {
+    padding: 40px 25px;
+  }
+
+  .home-bottom {
+    padding: 60px 15px;
+  }
+
+  .home-bottom h2 {
+    font-size: 1.6rem;
+  }
+
+  .home-bottom p {
+    font-size: 1.1rem;
+  }
+}

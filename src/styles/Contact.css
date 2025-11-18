@@ -1,0 +1,77 @@
+.contact{
+    text-align: center;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-image: url('../assets/pic4.jpg');
+    background-size: cover;
+    background-position: center -20px;
+    background-repeat: no-repeat;
+}
+.form{
+    background-color: rgba(255, 255, 255, 0.5);
+    border: solid 1px black;
+    border-radius: 10px;
+    padding: 30px 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 50%;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+h1{
+    font-size: 50px;
+    font-family: 'Times New Roman', Times, serif;
+}
+input::placeholder,textarea::placeholder{
+    text-align: center;
+    color: #888;
+}
+input,textarea{
+    width: 95%;
+    margin: 8px 0;
+    padding: 10px;
+    border: 1px solid black;
+    border-radius: 6px;
+    text-align: center;
+    resize: none;
+}
+button{
+    margin-top: 15px;
+    padding: 10px 20px;background-color:rgb(26, 7, 1);
+    color: white;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+button:hover{
+    background-color:rgb(60, 15, 2);
+}
+.sixthline{
+    margin-top: 20px;
+    text-align: center;
+    color: black;
+    font-weight: bold;
+}
+.form >div{
+    width: 100%;
+}
+.secondline{
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    gap: 10px;
+    box-sizing: border-box;
+}
+.secondline input{
+  width: calc(50%-5px);
+}
+@media(max-width:768px){
+    .form{
+        width: 70%;
+    }
+}

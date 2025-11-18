@@ -1,0 +1,36 @@
+.footer {
+  width: 100%;
+  height: 100px;
+  background-color: rgb(48, 47, 47);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  box-sizing: border-box;
+}
+
+.socialMedia {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 8px;
+}
+
+.socialMedia svg {
+  font-size: 28px;
+  cursor: pointer;
+  transition: color 0.3s, transform 0.2s;
+}
+
+.socialMedia svg:hover {
+  color: #f57c00; /* your orange accent */
+  transform: scale(1.2);
+}
+
+.footer p {
+  font-size: 0.9rem;
+  opacity: 0.8;
+}

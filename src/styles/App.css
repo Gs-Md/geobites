@@ -1,0 +1,11 @@
+.App{
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+.page-content{
+    flex: 1;
+    padding-top:100px ;
+    padding-bottom: 60px;
+    background-color: white;
+}

@@ -1,0 +1,95 @@
+.inbox {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+.inbox h1 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: rgb(26, 7, 1);
+}
+
+.inbox-error {
+  color: #b00020;
+  font-weight: 600;
+  text-align: center;
+}
+
+.inbox-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.inbox-card {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 14px 16px;
+  position: relative;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: transform 0.2s ease;
+}
+
+.inbox-card:hover {
+  transform: scale(1.01);
+}
+
+/* delete button (top-right corner) */
+.delete-btn {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  border: none;
+  background: transparent;
+  color: #b00020;
+  font-size: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.2s, color 0.2s;
+}
+
+.delete-btn:hover {
+  color: red;
+  transform: scale(1.2);
+}
+
+/* message info */
+.inbox-top {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  font-size: 0.95rem;
+  color: #333;
+}
+
+.inbox-subject {
+  font-weight: 700;
+  margin-bottom: 6px;
+  color: #222;
+}
+
+.inbox-body {
+  white-space: pre-wrap;
+  color: #444;
+  line-height: 1.5;
+}
+
+/* mobile adjustments */
+@media (max-width: 768px) {
+  .inbox-card {
+    font-size: 0.9rem;
+    padding: 12px;
+  }
+
+  .delete-btn {
+    font-size: 18px;
+  }
+
+  .inbox-top {
+    flex-direction: column;
+    gap: 4px;
+  }
+}
