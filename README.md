@@ -62,3 +62,26 @@ geobites/
 
 The project will run on:
 http://localhost:3000
+
+##  Screenshots
+
+### Home Page
+![Home](./screenshots/home.png)
+
+### About Page
+![About](./screenshots/about.png)
+
+### Menu Page
+![Menu](./screenshots/menu.png)
+
+### Order Page
+![Order](./screenshots/order.png)
+
+### Contact Page
+![Contact](./screenshots/contact.png)
+
+### Cart(Order) Page
+![Cart(Order)](./screenshots/cart(order).png)
+
+### Login-Signup
+![Login-Signup](./screenshots/login-Signup.png)
