@@ -19,7 +19,8 @@ const Navbar = ({ cartCount = 0, isLoggedIn, setIsLoggedIn, isOwner, setIsOwner,
         onLogout();
       } else {
         try {
-          await fetch("http://localhost:4000/api/auth/logout", {
+          const API_BASE = process.env.REACT_APP_API_BASE || "";
+          await fetch(`${API_BASE}/api/auth/logout`, {
             method: "POST",
             credentials: "include",
           });

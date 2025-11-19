@@ -6,7 +6,8 @@ const Inbox = () => {
   const [error, setError] = useState("");
 
   const loadMessages = () => {
-    fetch("http://localhost:4000/api/contact", { credentials: "include" })
+    const API_BASE = process.env.REACT_APP_API_BASE || "";
+    fetch(`${API_BASE}/api/contact`, { credentials: "include" })
       .then(async (r) => {
         if (!r.ok) {
           const d = await r.json().catch(() => ({}));
@@ -28,7 +29,8 @@ const Inbox = () => {
   const deleteMessage = async (id) => {
     if (!window.confirm("Delete this message?")) return;
     try {
-      const res = await fetch(`http://localhost:4000/api/contact/${id}`, {
+      const API_BASE = process.env.REACT_APP_API_BASE || "";
+      const res = await fetch(`${API_BASE}/api/contact/${id}`, {
         method: "DELETE",
         credentials: "include",
       });

@@ -11,7 +11,8 @@ const Contact = () => {
     e.preventDefault();
     setStatus("");
     try {
-      const res = await fetch("http://localhost:4000/api/contact", {
+      const API_BASE = process.env.REACT_APP_API_BASE || "";
+      const res = await fetch(`${API_BASE}/api/contact`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
