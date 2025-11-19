@@ -364,7 +364,7 @@ app.get("/api/orders", requireOwner, async (_req, res) => {
 /* ============ Serve React build (if present) ============ */
 const clientBuildPath = path.join(__dirname, "..", "build");
 app.use(express.static(clientBuildPath));
-app.get("*", (req, res, next) => {
+app.get("/*", (req, res, next) => {
   // let API routes continue
   if (req.path.startsWith("/api")) return next();
   res.sendFile(path.join(clientBuildPath, "index.html"), (err) => {
