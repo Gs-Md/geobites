@@ -1,14 +1,20 @@
-import React from "react";
+import React, { useState } from "react";
 import "../styles/Order.css";
+import CheckoutModal from "../components/CheckoutModal";
 
-const Order = ({ cart, incQty, decQty, removeItem }) => {
+const Order = ({ cart, incQty, decQty, removeItem, currentUser, onClearCart }) => {
+  const [showCheckout, setShowCheckout] = useState(false);
+  const [placedId, setPlacedId] = useState(null);
   const subtotal = cart.reduce((sum, it) => sum + it.price * it.qty, 0);
 
   return (
     <div className="order-background">
-      {" "}
       <div className="order-page">
         <h1 className="order-title">🛒 Your Order</h1>
+
+        {placedId && (
+          <p className="order-confirm">Order placed! ID: {placedId}</p>
+        )}
 
         {cart.length === 0 ? (
           <p className="empty-cart">
@@ -61,11 +67,26 @@ const Order = ({ cart, incQty, decQty, removeItem }) => {
 
             <button
               className="checkout-btn"
-              onClick={() => alert("Later: connect to payment or order API")}
+              onClick={() => setShowCheckout(true)}
             >
               Proceed to Checkout
             </button>
           </>
+        )}
+
+        {showCheckout && (
+          <CheckoutModal
+            cart={cart}
+            subtotal={subtotal}
+            currentUser={currentUser}
+            onClose={() => setShowCheckout(false)}
+            onPlaced={(orderId) => {
+              setPlacedId(orderId);
+              setShowCheckout(false);
+              // clear cart locally
+              onClearCart && onClearCart();
+            }}
+          />
         )}
       </div>
     </div>

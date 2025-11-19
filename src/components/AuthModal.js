@@ -1,5 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import "../styles/AuthModal.css";
+import { signup, login } from "../services/authService";
+
 
 const initial = { email: "", password: "", name: "", confirm: "" };
 
@@ -31,39 +33,52 @@ const AuthModal = ({ onClose, onLoginSuccess }) => {
 
   const validate = () => {
     setError("");
-    const { email, password } = formData;
+    const { email, password, name, confirm } = formData;
     const emailOK = /^\S+@\S+\.\S+$/.test(email);
     if (!emailOK) return "Please enter a valid email address.";
     if (!password || password.length < 6)
       return "Password must be at least 6 characters.";
+    if (activeTab === "signup") {
+      if (!name || name.trim().length === 0) return "Please enter your name.";
+      if (password !== confirm) return "Passwords do not match.";
+    }
     return "";
   };
 
   const onSubmit = async (e) => {
     e.preventDefault();
-    const msg = validate();
-    if (msg) return setError(msg);
-
-    try {
-      const res = await fetch("http://localhost:4000/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({
+    setError("");
+    // basic validations
+    if (activeTab === "signup") {
+      if (formData.password !== formData.confirm) {
+        return setError("Passwords do not match");
+      }
+      if (!formData.name) return setError("Please enter your name");
+      try {
+        const user = await signup({
+          name: formData.name,
           email: formData.email,
           password: formData.password,
-        }),
-      });
-      if (!res.ok) {
-        const d = await res.json().catch(() => ({}));
-        throw new Error(d.message || "Login failed");
+        });
+        onLoginSuccess && onLoginSuccess(user);
+        onClose();
+      } catch (err) {
+        setError(err.message);
       }
-      onLoginSuccess();
-    } catch (err) {
-      setError(err.message);
       return;
     }
-    onClose();
+
+    // login flow
+    try {
+      const user = await login({
+        email: formData.email,
+        password: formData.password,
+      });
+      onLoginSuccess && onLoginSuccess(user);
+      onClose();
+    } catch (err) {
+      setError(err.message);
+    }
   };
 
   const switchTab = (t) => {
@@ -84,7 +99,12 @@ const AuthModal = ({ onClose, onLoginSuccess }) => {
         ref={modalRef}
         onMouseDown={(e) => e.stopPropagation()}
       >
-        <button className="close-btn" type="button" onClick={onClose} aria-label="Close">
+        <button
+          className="close-btn"
+          type="button"
+          onClick={onClose}
+          aria-label="Close"
+        >
           ×
         </button>
 
@@ -104,14 +124,24 @@ const AuthModal = ({ onClose, onLoginSuccess }) => {
             className={activeTab === "signup" ? "active" : ""}
             onClick={() => switchTab("signup")}
             type="button"
-            disabled
-            title="Owner account only in this demo"
+            
           >
             Sign Up
           </button>
         </div>
 
         <form onSubmit={onSubmit} noValidate>
+          {activeTab === "signup" && (
+            <input
+              type="text"
+              name="name"
+              placeholder="Full name"
+              value={formData.name}
+              onChange={onChange}
+              required
+            />
+          )}
+
           <input
             type="email"
             name="email"
@@ -121,25 +151,48 @@ const AuthModal = ({ onClose, onLoginSuccess }) => {
             autoComplete="email"
             required
           />
+
           <input
             type="password"
             name="password"
             placeholder="Password"
             value={formData.password}
             onChange={onChange}
-            autoComplete="current-password"
+            autoComplete={activeTab === "signup" ? "new-password" : "current-password"}
             required
           />
 
-          {error && <p className="error" role="alert">{error}</p>}
-          <button type="submit" className="submit-btn">Log In</button>
-          <button
-            type="button"
-            className="link-btn"
-            onClick={() => alert("Forgot password flow not implemented in this demo")}
-          >
-          Forgot password?
+          {activeTab === "signup" && (
+            <input
+              type="password"
+              name="confirm"
+              placeholder="Confirm password"
+              value={formData.confirm}
+              onChange={onChange}
+              autoComplete="new-password"
+              required
+            />
+          )}
+
+          {error && (
+            <p className="error" role="alert">
+              {error}
+            </p>
+          )}
+          <button type="submit" className="submit-btn">
+            {activeTab === "signup" ? "Sign Up" : "Log In"}
           </button>
+          {activeTab === "login" && (
+            <button
+              type="button"
+              className="link-btn"
+              onClick={() =>
+                alert("Forgot password flow not implemented in this demo")
+              }
+            >
+              Forgot password?
+            </button>
+          )}
         </form>
       </div>
     </div>

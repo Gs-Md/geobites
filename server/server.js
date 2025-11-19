@@ -4,6 +4,7 @@ const express = require("express");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
 const path = require("path");
 const fs = require("fs").promises;
 const { randomUUID } = require("crypto");
@@ -28,6 +29,9 @@ const COOKIE_BASE = {
 // file storage
 const DATA_DIR = path.join(__dirname, "data");
 const CONTACTS_PATH = path.join(DATA_DIR, "contact.json");
+const USERS_PATH = path.join(DATA_DIR, "users.json");
+const CARTS_PATH = path.join(DATA_DIR, "carts.json");
+const ORDERS_PATH = path.join(DATA_DIR, "orders.json");
 
 /* ============ Store utils ============ */
 async function ensureStore() {
@@ -36,6 +40,21 @@ async function ensureStore() {
     await fs.access(CONTACTS_PATH);
   } catch {
     await fs.writeFile(CONTACTS_PATH, "[]", "utf8");
+  }
+  try {
+    await fs.access(USERS_PATH);
+  } catch {
+    await fs.writeFile(USERS_PATH, "[]", "utf8");
+  }
+  try {
+    await fs.access(CARTS_PATH);
+  } catch {
+    await fs.writeFile(CARTS_PATH, "{}", "utf8");
+  }
+  try {
+    await fs.access(ORDERS_PATH);
+  } catch {
+    await fs.writeFile(ORDERS_PATH, "[]", "utf8");
   }
 }
 async function readContacts() {
@@ -48,6 +67,46 @@ async function readContacts() {
 }
 async function writeContacts(list) {
   await fs.writeFile(CONTACTS_PATH, JSON.stringify(list, null, 2), "utf8");
+}
+
+/* ============ Users store ============ */
+async function readUsers() {
+  try {
+    const raw = await fs.readFile(USERS_PATH, "utf8");
+    return JSON.parse(raw || "[]");
+  } catch {
+    return [];
+  }
+}
+
+async function writeUsers(list) {
+  await fs.writeFile(USERS_PATH, JSON.stringify(list, null, 2), "utf8");
+}
+
+/* ============ Carts store ============ */
+async function readCarts() {
+  try {
+    const raw = await fs.readFile(CARTS_PATH, "utf8");
+    return JSON.parse(raw || "{}");
+  } catch {
+    return {};
+  }
+}
+
+async function writeCarts(obj) {
+  await fs.writeFile(CARTS_PATH, JSON.stringify(obj, null, 2), "utf8");
+}
+
+function requireAuth(req, res, next) {
+  const token = req.cookies?.token;
+  if (!token) return res.status(401).json({ message: "Unauthorized" });
+  try {
+    const payload = jwt.verify(token, JWT_SECRET);
+    req.user = payload;
+    next();
+  } catch (e) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
 }
 
 /* ============ Middleware ============ */
@@ -101,11 +160,47 @@ app.post("/api/auth/login", (req, res) => {
   if (typeof email !== "string" || typeof password !== "string") {
     return res.status(400).json({ message: "Invalid payload" });
   }
+  // owner shortcut
   if (email === OWNER_EMAIL && password === OWNER_PASSWORD) {
     setOwnerCookie(res, email);
     return res.json({ ok: true, role: "owner", email });
   }
-  return res.status(401).json({ message: "Invalid credentials" });
+
+  // check users store
+  (async () => {
+    try {
+      const users = await readUsers();
+      const u = users.find((x) => x.email === email);
+      if (!u) return res.status(401).json({ message: "Invalid credentials" });
+      const ok = bcrypt.compareSync(password, u.passwordHash || "");
+      if (!ok) return res.status(401).json({ message: "Invalid credentials" });
+      const token = jwt.sign({ role: "user", email: u.email, name: u.name }, JWT_SECRET, { expiresIn: "7d" });
+      res.cookie("token", token, COOKIE_BASE);
+      return res.json({ ok: true, role: "user", email: u.email, name: u.name });
+    } catch (e) {
+      console.error("login error", e);
+      return res.status(500).json({ message: "Server error" });
+    }
+  })();
+});
+
+app.post("/api/auth/signup", async (req, res) => {
+  const { name = "", email = "", password = "" } = req.body || {};
+  if (!email || !password || !name) return res.status(400).json({ message: "Missing fields" });
+  try {
+    const users = await readUsers();
+    if (users.find((u) => u.email === email)) return res.status(400).json({ message: "User exists" });
+    const passwordHash = bcrypt.hashSync(password, 10);
+    const user = { email, name, passwordHash };
+    users.push(user);
+    await writeUsers(users);
+    const token = jwt.sign({ role: "user", email: user.email, name: user.name }, JWT_SECRET, { expiresIn: "7d" });
+    res.cookie("token", token, COOKIE_BASE);
+    res.json({ ok: true, role: "user", email: user.email, name: user.name });
+  } catch (e) {
+    console.error("signup error", e);
+    res.status(500).json({ message: "Failed to create user" });
+  }
 });
 
 app.post("/api/auth/logout", (_req, res) => {
@@ -126,8 +221,9 @@ app.get("/api/auth/me", (req, res) => {
       authenticated: true,
       role: payload.role,
       email: payload.email,
+      name: payload.name,
     });
-  } catch {
+  } catch (e) {
     return res.json({ authenticated: false });
   }
 });
@@ -185,6 +281,83 @@ app.delete("/api/contact/:id", requireOwner, async (req, res) => {
   } catch (e) {
     console.error("Delete error", e);
     res.status(500).json({ message: "Failed to delete" });
+  }
+});
+
+/* ============ Cart routes ============ */
+app.get("/api/cart", requireAuth, async (req, res) => {
+  try {
+    const carts = await readCarts();
+    const cart = carts[req.user.email] || [];
+    res.json(cart);
+  } catch (e) {
+    res.status(500).json({ message: "Failed to read cart" });
+  }
+});
+
+app.post("/api/cart", requireAuth, async (req, res) => {
+  try {
+    const carts = await readCarts();
+    const newCart = Array.isArray(req.body) ? req.body : [];
+    carts[req.user.email] = newCart;
+    await writeCarts(carts);
+    res.json({ ok: true });
+  } catch (e) {
+    console.error("save cart error", e);
+    res.status(500).json({ message: "Failed to save cart" });
+  }
+});
+
+/* ============ Orders store ============ */
+async function readOrders() {
+  try {
+    const raw = await fs.readFile(ORDERS_PATH, "utf8");
+    return JSON.parse(raw || "[]");
+  } catch {
+    return [];
+  }
+}
+
+async function writeOrders(list) {
+  await fs.writeFile(ORDERS_PATH, JSON.stringify(list, null, 2), "utf8");
+}
+
+/* ============ Orders routes ============ */
+app.post("/api/orders", requireAuth, async (req, res) => {
+  try {
+    const { name = "", address = "", items = [], subtotal = 0, fee = 0, total = 0 } = req.body || {};
+    if (!name || !address || !Array.isArray(items) || items.length === 0) {
+      return res.status(400).json({ message: "Missing order fields" });
+    }
+    const orders = await readOrders();
+    const order = {
+      id: randomUUID(),
+      email: req.user.email,
+      name,
+      address,
+      items,
+      subtotal,
+      fee,
+      total,
+      createdAt: new Date().toISOString(),
+    };
+    orders.push(order);
+    await writeOrders(orders);
+    res.json({ ok: true, orderId: order.id });
+  } catch (e) {
+    console.error("save order error", e);
+    res.status(500).json({ message: "Failed to save order" });
+  }
+});
+
+// Owner can list orders
+app.get("/api/orders", requireOwner, async (_req, res) => {
+  try {
+    const orders = await readOrders();
+    orders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    res.json(orders);
+  } catch (e) {
+    res.status(500).json({ message: "Failed to read orders" });
   }
 });
 

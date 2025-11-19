@@ -5,7 +5,7 @@ import "../styles/Navbar.css";
 import AuthModal from "../components/AuthModal";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 
-const Navbar = ({ cartCount = 0, isLoggedIn, setIsLoggedIn, isOwner, setIsOwner }) => {
+const Navbar = ({ cartCount = 0, isLoggedIn, setIsLoggedIn, isOwner, setIsOwner, onLoginSuccess, onLogout, currentUser }) => {
   const [showAuth, setShowAuth] = useState(false);
   const navigate = useNavigate();
 
@@ -14,13 +14,21 @@ const Navbar = ({ cartCount = 0, isLoggedIn, setIsLoggedIn, isOwner, setIsOwner 
 
   const handleAuthClick = async () => {
     if (isLoggedIn) {
-      // logout
-      await fetch("http://localhost:4000/api/auth/logout", {
-        method: "POST",
-        credentials: "include",
-      });
-      setIsLoggedIn(false);
-      setIsOwner(false);
+      // prefer caller-provided logout handler (App), otherwise call demo server endpoint
+      if (onLogout) {
+        onLogout();
+      } else {
+        try {
+          await fetch("http://localhost:4000/api/auth/logout", {
+            method: "POST",
+            credentials: "include",
+          });
+        } catch (e) {
+          // ignore network errors in demo
+        }
+        setIsLoggedIn(false);
+        setIsOwner(false);
+      }
       navigate("/");
     } else {
       openAuth();
@@ -44,6 +52,10 @@ const Navbar = ({ cartCount = 0, isLoggedIn, setIsLoggedIn, isOwner, setIsOwner 
 
           {isOwner && <Link to="/Inbox">Messages</Link>}
 
+          {currentUser && (
+            <span className="user-greeting">Hi, {currentUser.name}</span>
+          )}
+
           <Link to="/order" className="cart-btn">
             <ShoppingCartIcon className="cart-icon" />
             {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
@@ -58,10 +70,14 @@ const Navbar = ({ cartCount = 0, isLoggedIn, setIsLoggedIn, isOwner, setIsOwner 
       {showAuth && (
         <AuthModal
           onClose={closeAuth}
-          onLoginSuccess={() => {
-            // After login, App will set flags via /auth/me, but set now for snappier UI:
-            setIsLoggedIn(true);
-            setIsOwner(true);
+          onLoginSuccess={(user) => {
+            if (onLoginSuccess) {
+              onLoginSuccess(user);
+            } else {
+              // After login, App will set flags via /auth/me, but set now for snappier UI:
+              setIsLoggedIn(true);
+              setIsOwner(true);
+            }
             closeAuth();
           }}
         />

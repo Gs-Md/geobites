@@ -9,31 +9,58 @@ import Contact from "./pages/Contact";
 import Inbox from "./pages/Inbox"; 
 import "./styles/App.css";
 import { useEffect, useState } from "react";
+import { getCurrentUser, logout as authLogout } from "./services/authService";
+import { loadCart, saveCart } from "./services/cartService";
 
 function App() {
   const [cart, setCart] = useState([]); 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isOwner, setIsOwner] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
 
   useEffect(() => {
-    fetch("http://localhost:4000/api/auth/me", {
-      credentials: "include",
-    })
-      .then((r) => r.json())
-      .then((data) => {
-        if (data.authenticated && data.role === "owner") {
-          setIsLoggedIn(true);
-          setIsOwner(true);
-        } else {
-          setIsLoggedIn(false);
-          setIsOwner(false);
+    // Check server for current user session
+    (async () => {
+      const u = await getCurrentUser();
+      if (u) {
+        setCurrentUser(u);
+        setIsLoggedIn(true);
+        setIsOwner(u.role === "owner");
+        // load server-side cart
+        try {
+          const r = await fetch("/api/cart", { credentials: "include" });
+          if (r.ok) {
+            const cartData = await r.json();
+            setCart(Array.isArray(cartData) ? cartData : []);
+          }
+        } catch (e) {
+          // ignore
         }
-      })
-      .catch(() => {
+      } else {
         setIsLoggedIn(false);
         setIsOwner(false);
-      });
+        setCurrentUser(null);
+      }
+    })();
   }, []);
+
+  // Persist cart for the current user (server-backed)
+  useEffect(() => {
+    if (currentUser && currentUser.email) {
+      (async () => {
+        try {
+          await fetch("/api/cart", {
+            method: "POST",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(cart),
+          });
+        } catch (e) {
+          // ignore
+        }
+      })();
+    }
+  }, [cart, currentUser]);
 
   const addToCart = (item) => {
     setCart((prev) => {
@@ -43,6 +70,36 @@ function App() {
       copy[idx] = { ...copy[idx], qty: copy[idx].qty + 1 };
       return copy;
     });
+  };
+
+  const handleLoginSuccess = (user) => {
+    setCurrentUser(user || null);
+    setIsLoggedIn(true);
+    setIsOwner(user?.role === "owner");
+    // load cart for this user
+    (async () => {
+      try {
+        const r = await fetch("/api/cart", { credentials: "include" });
+        if (r.ok) {
+          const cartData = await r.json();
+          setCart(Array.isArray(cartData) ? cartData : []);
+        }
+      } catch (e) {
+        // ignore
+      }
+    })();
+  };
+
+  const handleLogout = async () => {
+    try {
+      await authLogout();
+    } catch (e) {
+      // ignore
+    }
+    setCurrentUser(null);
+    setIsLoggedIn(false);
+    setIsOwner(false);
+    setCart([]);
   };
 
   const incQty = (id) =>
@@ -62,6 +119,20 @@ function App() {
   const removeItem = (id) =>
     setCart((prev) => prev.filter((it) => it.id !== id));
 
+  const clearCart = async () => {
+    try {
+      await fetch("/api/cart", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify([]),
+      });
+    } catch (e) {
+      // ignore
+    }
+    setCart([]);
+  };
+
   return (
     <Router>
       <div className="App">
@@ -71,6 +142,9 @@ function App() {
           setIsLoggedIn={setIsLoggedIn}
           isOwner={isOwner}
           setIsOwner={setIsOwner}
+          onLoginSuccess={handleLoginSuccess}
+          onLogout={handleLogout}
+          currentUser={currentUser}
         />
 
         <div className="page-content">
@@ -89,6 +163,8 @@ function App() {
                   incQty={incQty}
                   decQty={decQty}
                   removeItem={removeItem}
+                  currentUser={currentUser}
+                  onClearCart={clearCart}
                 />
               }
             />
