@@ -1,4 +1,7 @@
-export const API_BASE = process.env.REACT_APP_API_BASE || "";
+export const API_BASE =
+  (process.env.REACT_APP_API_BASE &&
+    process.env.REACT_APP_API_BASE.trim()) ||
+  "https://geobites.onrender.com";
 
 async function handleJSON(res) {
   const text = await res.text();
@@ -16,10 +19,12 @@ export async function signup({ name, email, password }) {
     credentials: "include",
     body: JSON.stringify({ name, email, password }),
   });
+
   if (!res.ok) {
     const d = await handleJSON(res).catch(() => ({}));
     throw new Error(d.message || "Signup failed");
   }
+
   return handleJSON(res);
 }
 
@@ -30,10 +35,12 @@ export async function login({ email, password }) {
     credentials: "include",
     body: JSON.stringify({ email, password }),
   });
+
   if (!res.ok) {
     const d = await handleJSON(res).catch(() => ({}));
     throw new Error(d.message || "Login failed");
   }
+
   return handleJSON(res);
 }
 
@@ -54,8 +61,11 @@ export async function getCurrentUser() {
       credentials: "include",
     });
     if (!res.ok) return null;
+
     const d = await handleJSON(res);
-    if (d && d.authenticated) return { email: d.email, name: d.name, role: d.role };
+    if (d && d.authenticated)
+      return { email: d.email, name: d.name, role: d.role };
+
     return null;
   } catch (e) {
     return null;
