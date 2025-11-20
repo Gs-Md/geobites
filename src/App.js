@@ -6,14 +6,13 @@ import About from "./pages/About";
 import Menu from "./pages/Menu";
 import Order from "./pages/Order";
 import Contact from "./pages/Contact";
-import Inbox from "./pages/Inbox"; 
+import Inbox from "./pages/Inbox";
 import "./styles/App.css";
 import { useEffect, useState } from "react";
-import { getCurrentUser, logout as authLogout } from "./services/authService";
-import { loadCart, saveCart } from "./services/cartService";
+import { getCurrentUser, logout as authLogout, API_BASE } from "./services/authService";
 
 function App() {
-  const [cart, setCart] = useState([]); 
+  const [cart, setCart] = useState([]);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isOwner, setIsOwner] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
@@ -26,9 +25,12 @@ function App() {
         setCurrentUser(u);
         setIsLoggedIn(true);
         setIsOwner(u.role === "owner");
+
         // load server-side cart
         try {
-          const r = await fetch("/api/cart", { credentials: "include" });
+          const r = await fetch(`${API_BASE}/api/cart`, {
+            credentials: "include",
+          });
           if (r.ok) {
             const cartData = await r.json();
             setCart(Array.isArray(cartData) ? cartData : []);
@@ -49,7 +51,7 @@ function App() {
     if (currentUser && currentUser.email) {
       (async () => {
         try {
-          await fetch("/api/cart", {
+          await fetch(`${API_BASE}/api/cart`, {
             method: "POST",
             credentials: "include",
             headers: { "Content-Type": "application/json" },
@@ -76,10 +78,13 @@ function App() {
     setCurrentUser(user || null);
     setIsLoggedIn(true);
     setIsOwner(user?.role === "owner");
-    // load cart for this user
+
+    // load cart for this user after login
     (async () => {
       try {
-        const r = await fetch("/api/cart", { credentials: "include" });
+        const r = await fetch(${API_BASE}/api/cart, {
+          credentials: "include",
+        });
         if (r.ok) {
           const cartData = await r.json();
           setCart(Array.isArray(cartData) ? cartData : []);
@@ -121,7 +126,7 @@ function App() {
 
   const clearCart = async () => {
     try {
-      await fetch("/api/cart", {
+      await fetch(${API_BASE}/api/cart, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
@@ -178,4 +183,5 @@ function App() {
     </Router>
   );
 }
+
 export default App;

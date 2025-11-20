@@ -1,7 +1,4 @@
-export const API_BASE =
-  (process.env.REACT_APP_API_BASE &&
-    process.env.REACT_APP_API_BASE.trim()) ||
-  "https://geobites.onrender.com";
+export const API_BASE = "https://geobites.onrender.com"
 
 async function handleJSON(res) {
   const text = await res.text();

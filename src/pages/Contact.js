@@ -1,17 +1,23 @@
 import React, { useState } from "react";
 import "../styles/Contact.css";
+import { API_BASE } from "../services/authService";
 
 const Contact = () => {
-  const [form, setForm] = useState({ name: "", subject: "", email: "", description: "" });
+  const [form, setForm] = useState({
+    name: "",
+    subject: "",
+    email: "",
+    description: "",
+  });
   const [status, setStatus] = useState("");
 
-  const onChange = (e) => setForm((s) => ({ ...s, [e.target.name]: e.target.value }));
+  const onChange = (e) =>
+    setForm((s) => ({ ...s, [e.target.name]: e.target.value }));
 
   const onSubmit = async (e) => {
     e.preventDefault();
     setStatus("");
     try {
-      const API_BASE = process.env.REACT_APP_API_BASE || "";
       const res = await fetch(`${API_BASE}/api/contact`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -29,13 +35,33 @@ const Contact = () => {
   return (
     <div className="contact">
       <form className="form" onSubmit={onSubmit}>
-        <div className="firstline"><h1>WE'RE ALL EARS</h1></div>
+        <div className="firstline">
+          <h1>WE'RE ALL EARS</h1>
+        </div>
         <div className="secondline">
-          <input type="text" name="name" placeholder="NAME" value={form.name} onChange={onChange} />
-          <input type="text" name="subject" placeholder="SUBJECT" value={form.subject} onChange={onChange} />
+          <input
+            type="text"
+            name="name"
+            placeholder="NAME"
+            value={form.name}
+            onChange={onChange}
+          />
+          <input
+            type="text"
+            name="subject"
+            placeholder="SUBJECT"
+            value={form.subject}
+            onChange={onChange}
+          />
         </div>
         <div className="thirdline">
-          <input type="email" name="email" placeholder="EMAIL" value={form.email} onChange={onChange} />
+          <input
+            type="email"
+            name="email"
+            placeholder="EMAIL"
+            value={form.email}
+            onChange={onChange}
+          />
         </div>
         <div className="fourthline">
           <textarea
@@ -53,7 +79,8 @@ const Contact = () => {
         {status && <p style={{ marginTop: 12, fontWeight: 600 }}>{status}</p>}
         <div className="sixthline">
           <p>
-            YOU CAN ALSO EMAIL:<br />
+            YOU CAN ALSO EMAIL:
+            <br />
             CONTACT@EMAIL.COM OR CALL <br />
             US ON: 03/100200
           </p>

@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import "../styles/Inbox.css";
+import { API_BASE } from "../services/authService";
 
 const Inbox = () => {
   const [messages, setMessages] = useState(null);
   const [error, setError] = useState("");
 
   const loadMessages = () => {
-    const API_BASE = process.env.REACT_APP_API_BASE || "";
     fetch(`${API_BASE}/api/contact`, { credentials: "include" })
       .then(async (r) => {
         if (!r.ok) {
@@ -29,7 +29,6 @@ const Inbox = () => {
   const deleteMessage = async (id) => {
     if (!window.confirm("Delete this message?")) return;
     try {
-      const API_BASE = process.env.REACT_APP_API_BASE || "";
       const res = await fetch(`${API_BASE}/api/contact/${id}`, {
         method: "DELETE",
         credentials: "include",
@@ -45,7 +44,9 @@ const Inbox = () => {
     return (
       <div className="inbox">
         <h1>Messages</h1>
-        <p className="inbox-error">⚠️ {error}. Log in as owner to view messages.</p>
+        <p className="inbox-error">
+          ⚠ {error}. Log in as owner to view messages.
+        </p>
       </div>
     );
   }
@@ -78,11 +79,13 @@ const Inbox = () => {
 
               <div className="inbox-top">
                 <div>
-                  <strong>{m.name || "Anonymous"}</strong> &middot;{" "}
+                  <strong>{m.name || "Anonymous"}</strong> ·{" "}
                   {m.email || "No email"}
                 </div>
                 <div className="inbox-date">
-                  {m.createdAt ? new Date(m.createdAt).toLocaleString() : "No date"}
+                  {m.createdAt
+                    ? new Date(m.createdAt).toLocaleString()
+                    : "No date"}
                 </div>
               </div>
 
