@@ -167,7 +167,7 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.options("*", cors(corsOptions)); // preflight
+
 
 // small logger
 app.use((req, _res, next) => {
