@@ -166,7 +166,14 @@ const corsOptions = {
   allowedHeaders: ["Content-Type", "Authorization"],
 };
 
-app.use(cors(corsOptions));
+app.use(
+  cors({
+    origin: "https://geobites.vercel.app",
+    credentials: true,
+    methods: ["GET", "POST", "DELETE", "PUT", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 
 
 // small logger
@@ -212,7 +219,11 @@ app.post("/api/auth/login", (req, res) => {
         JWT_SECRET,
         { expiresIn: "7d" }
       );
-      res.cookie("token", token, COOKIE_BASE);
+      res.cookie("token", token, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "none",
+      });
       return res.json({
         ok: true,
         role: "user",
