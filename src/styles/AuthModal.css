@@ -37,12 +37,18 @@
   overflow: hidden;
   border: 1px solid #eee;
 }
-
+.tabs button.active{
+  background-color: rgb(26,7,1);
+  color: white;
+}
+.tabs button:hover{
+  background-color: #c8b6ac;
+}
 .tabs button {
   flex: 1;
   padding: 10px;
   border: 0;
-  background: #f3f3f3;
+  background: #ddd0c8;
   cursor: pointer;
   font-weight: 600;
   transition: background .25s, color .25s;
