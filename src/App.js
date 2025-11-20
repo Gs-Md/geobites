@@ -82,7 +82,7 @@ function App() {
     // load cart for this user after login
     (async () => {
       try {
-        const r = await fetch(${API_BASE}/api/cart, {
+        const r = await fetch(`${API_BASE}/api/cart`, {
           credentials: "include",
         });
         if (r.ok) {
@@ -126,7 +126,7 @@ function App() {
 
   const clearCart = async () => {
     try {
-      await fetch(${API_BASE}/api/cart, {
+      await fetch(`${API_BASE}/api/cart`, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
