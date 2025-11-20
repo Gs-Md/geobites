@@ -171,7 +171,7 @@ app.options("*", cors(corsOptions)); // preflight
 
 // small logger
 app.use((req, _res, next) => {
-  console.log(${req.method} ${req.path}, {
+  console.log(`${req.method} ${req.path}`, {
     origin: req.headers.origin,
     hasCookie: !!req.cookies?.token,
   });
