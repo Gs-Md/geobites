@@ -1,3 +1,4 @@
+// server/server.js
 require("dotenv").config();
 
 const express = require("express");
@@ -25,10 +26,10 @@ const COOKIE_BASE = {
   httpOnly: true,
   sameSite: IS_PROD ? "none" : "lax",
   secure: IS_PROD,
-  maxAge: 7 * 24 * 60 * 60 * 1000,
+  maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
 };
 
-// file storage
+/* ============ File storage paths ============ */
 const DATA_DIR = path.join(__dirname, "data");
 const CONTACTS_PATH = path.join(DATA_DIR, "contact.json");
 const USERS_PATH = path.join(DATA_DIR, "users.json");
@@ -39,29 +40,18 @@ const ORDERS_PATH = path.join(DATA_DIR, "orders.json");
 async function ensureStore() {
   await fs.mkdir(DATA_DIR, { recursive: true });
 
-  try {
-    await fs.access(CONTACTS_PATH);
-  } catch {
-    await fs.writeFile(CONTACTS_PATH, "[]", "utf8");
+  async function ensureFile(filePath, fallback) {
+    try {
+      await fs.access(filePath);
+    } catch {
+      await fs.writeFile(filePath, fallback, "utf8");
+    }
   }
 
-  try {
-    await fs.access(USERS_PATH);
-  } catch {
-    await fs.writeFile(USERS_PATH, "[]", "utf8");
-  }
-
-  try {
-    await fs.access(CARTS_PATH);
-  } catch {
-    await fs.writeFile(CARTS_PATH, "{}", "utf8");
-  }
-
-  try {
-    await fs.access(ORDERS_PATH);
-  } catch {
-    await fs.writeFile(ORDERS_PATH, "[]", "utf8");
-  }
+  await ensureFile(CONTACTS_PATH, "[]");
+  await ensureFile(USERS_PATH, "[]");
+  await ensureFile(CARTS_PATH, "{}");
+  await ensureFile(ORDERS_PATH, "[]");
 }
 
 /* ---- Contacts ---- */
@@ -120,10 +110,11 @@ async function writeOrders(list) {
   await fs.writeFile(ORDERS_PATH, JSON.stringify(list, null, 2), "utf8");
 }
 
-/* ============ Auth middlewares ============ */
+/* ============ Auth helpers ============ */
 function requireAuth(req, res, next) {
   const token = req.cookies?.token;
   if (!token) return res.status(401).json({ message: "Unauthorized" });
+
   try {
     const payload = jwt.verify(token, JWT_SECRET);
     req.user = payload;
@@ -133,16 +124,10 @@ function requireAuth(req, res, next) {
   }
 }
 
-function setOwnerCookie(res, email) {
-  const token = jwt.sign({ role: "owner", email }, JWT_SECRET, {
-    expiresIn: "7d",
-  });
-  res.cookie("token", token, COOKIE_BASE);
-}
-
 function requireOwner(req, res, next) {
   const token = req.cookies?.token;
   if (!token) return res.status(401).json({ message: "Unauthorized" });
+
   try {
     const payload = jwt.verify(token, JWT_SECRET);
     if (payload.role !== "owner") {
@@ -165,18 +150,8 @@ const corsOptions = {
   methods: ["GET", "POST", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
 };
+app.use(cors(corsOptions));
 
-app.use(
-  cors({
-    origin: "https://geobites.vercel.app",
-    credentials: true,
-    methods: ["GET", "POST", "DELETE", "PUT", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-  })
-);
-
-
-// small logger
 app.use((req, _res, next) => {
   console.log(`${req.method} ${req.path}`, {
     origin: req.headers.origin,
@@ -189,52 +164,58 @@ app.use((req, _res, next) => {
 app.get("/health", (_req, res) => res.json({ ok: true }));
 
 /* ============ Auth routes ============ */
-app.post("/api/auth/login", (req, res) => {
+app.post("/api/auth/login", async (req, res) => {
   const { email, password } = req.body || {};
-
   if (typeof email !== "string" || typeof password !== "string") {
     return res.status(400).json({ message: "Invalid payload" });
   }
 
-  // owner shortcut
+  // Owner login
   if (email === OWNER_EMAIL && password === OWNER_PASSWORD) {
-    setOwnerCookie(res, email);
-    return res.json({ ok: true, role: "owner", email });
+    const token = jwt.sign(
+      { role: "owner", email },
+      JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    res.cookie("token", token, COOKIE_BASE);
+
+    return res.json({
+      ok: true,
+      role: "owner",
+      email,
+      token,
+    });
   }
 
-  // normal user
-  (async () => {
-    try {
-      const users = await readUsers();
-      const u = users.find((x) => x.email === email);
-      if (!u) {
-        return res.status(401).json({ message: "Invalid credentials" });
-      }
-      const ok = bcrypt.compareSync(password, u.passwordHash || "");
-      if (!ok) {
-        return res.status(401).json({ message: "Invalid credentials" });
-      }
-      const token = jwt.sign(
-        { role: "user", email: u.email, name: u.name },
-        JWT_SECRET,
-        { expiresIn: "7d" }
-      );
-      res.cookie("token", token, {
-        httpOnly: true,
-        secure: true,
-        sameSite: "none",
-      });
-      return res.json({
-        ok: true,
-        role: "user",
-        email: u.email,
-        name: u.name,
-      });
-    } catch (e) {
-      console.error("login error", e);
-      return res.status(500).json({ message: "Server error" });
-    }
-  })();
+  // Normal user login
+  try {
+    const users = await readUsers();
+    const u = users.find((x) => x.email === email);
+    if (!u) return res.status(401).json({ message: "Invalid credentials" });
+
+    const ok = bcrypt.compareSync(password, u.passwordHash || "");
+    if (!ok) return res.status(401).json({ message: "Invalid credentials" });
+
+    const token = jwt.sign(
+      { role: "user", email: u.email, name: u.name },
+      JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    res.cookie("token", token, COOKIE_BASE);
+
+    return res.json({
+      ok: true,
+      role: "user",
+      email: u.email,
+      name: u.name,
+      token,
+    });
+  } catch (e) {
+    console.error("login error", e);
+    return res.status(500).json({ message: "Server error" });
+  }
 });
 
 app.post("/api/auth/signup", async (req, res) => {
@@ -242,11 +223,13 @@ app.post("/api/auth/signup", async (req, res) => {
   if (!email || !password || !name) {
     return res.status(400).json({ message: "Missing fields" });
   }
+
   try {
     const users = await readUsers();
     if (users.find((u) => u.email === email)) {
       return res.status(400).json({ message: "User exists" });
     }
+
     const passwordHash = bcrypt.hashSync(password, 10);
     const user = { email, name, passwordHash };
     users.push(user);
@@ -257,12 +240,15 @@ app.post("/api/auth/signup", async (req, res) => {
       JWT_SECRET,
       { expiresIn: "7d" }
     );
+
     res.cookie("token", token, COOKIE_BASE);
+
     res.json({
       ok: true,
       role: "user",
       email: user.email,
       name: user.name,
+      token,
     });
   } catch (e) {
     console.error("signup error", e);
@@ -282,6 +268,7 @@ app.post("/api/auth/logout", (_req, res) => {
 app.get("/api/auth/me", (req, res) => {
   const token = req.cookies?.token;
   if (!token) return res.json({ authenticated: false });
+
   try {
     const payload = jwt.verify(token, JWT_SECRET);
     return res.json({
@@ -327,8 +314,7 @@ app.post("/api/contact", async (req, res) => {
     list.push(entry);
     await writeContacts(list);
     res.json({ ok: true });
-  } catch (e) {
-    console.error("contact save error", e);
+  } catch {
     res.status(500).json({ message: "Failed to save message" });
   }
 });
@@ -338,8 +324,7 @@ app.get("/api/contact", requireOwner, async (_req, res) => {
     const list = await readContacts();
     list.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     res.json(list);
-  } catch (e) {
-    console.error("contact read error", e);
+  } catch {
     res.status(500).json({ message: "Failed to read messages" });
   }
 });
@@ -368,8 +353,7 @@ app.get("/api/cart", requireAuth, async (req, res) => {
     const carts = await readCarts();
     const cart = carts[req.user.email] || [];
     res.json(cart);
-  } catch (e) {
-    console.error("cart read error", e);
+  } catch {
     res.status(500).json({ message: "Failed to read cart" });
   }
 });
@@ -424,16 +408,27 @@ app.post("/api/orders", requireAuth, async (req, res) => {
   }
 });
 
-// Owner can list orders
 app.get("/api/orders", requireOwner, async (_req, res) => {
   try {
     const orders = await readOrders();
     orders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     res.json(orders);
-  } catch (e) {
-    console.error("orders read error", e);
+  } catch {
     res.status(500).json({ message: "Failed to read orders" });
   }
+});
+
+/* ============ Serve React build ============ */
+const clientBuildPath = path.join(__dirname, "..", "build");
+app.use(express.static(clientBuildPath));
+
+app.use((req, res, next) => {
+  // Let API routes 404 normally
+  if (req.path.startsWith("/api")) return next();
+
+  res.sendFile(path.join(clientBuildPath, "index.html"), (err) => {
+    if (err) return next(err);
+  });
 });
 
 /* ============ Start ============ */
