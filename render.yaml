@@ -3,7 +3,15 @@ services:
     name: geobites
     env: node
     plan: free
-    branch: main
-    buildCommand: npm install
-    startCommand: npm start
     autoDeploy: true
+
+    buildCommand: |
+      cd backend
+      npm install
+      cd ../frontend
+      npm install
+      npm run build
+
+    startCommand: |
+      cd backend
+      npm start
