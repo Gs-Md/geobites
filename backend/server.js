@@ -418,17 +418,6 @@ app.get("/api/orders", requireOwner, async (_req, res) => {
   }
 });
 
-/* ============ Serve React build (from frontend/build) ============ */
-const clientBuildPath = path.join(__dirname, "..", "frontend", "build");
-app.use(express.static(clientBuildPath));
-
-
-app.use(express.static(clientBuildPath));
-
-// ✅ Node 22 safe catch-all for React Router (exclude /api)
-app.get(/^\/(?!api).*/, (req, res) => {
-  res.sendFile(path.join(clientBuildPath, "index.html"));
-});
 
 /* ============ Start ============ */
 (async () => {
