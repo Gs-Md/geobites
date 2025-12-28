@@ -1,3 +1,17 @@
 {
-  "owner@geobites.com": []
+  "owner@geobites.com": [],
+  "hazem@test.com": [
+    {
+      "id": "1",
+      "name": "Burger",
+      "price": 10,
+      "qty": 2
+    },
+    {
+      "id": "2",
+      "name": "Fries",
+      "price": 4,
+      "qty": 1
+    }
+  ]
 }
