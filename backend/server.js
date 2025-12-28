@@ -1,5 +1,6 @@
 require("dotenv").config();
 
+
 const express = require("express");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
@@ -10,7 +11,16 @@ const fs = require("fs").promises;
 const { randomUUID } = require("crypto");
 
 const app = express();
+const {testDb} = require("./db");
 
+app.get("/api/health", async (req, res) => {
+  try {
+    const ok = await testDb();
+    res.json({ ok });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: e.message });
+  }
+});
 /* ============ Config ============ */
 const PORT = Number(process.env.PORT) || 4000;
 

@@ -1,0 +1,40 @@
+-- Users
+CREATE TABLE IF NOT EXISTS users (
+  id CHAR(36) PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  email VARCHAR(191) NOT NULL UNIQUE,
+  password_hash VARCHAR(255) NOT NULL,
+  role ENUM('user','owner') NOT NULL DEFAULT 'user',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Contacts
+CREATE TABLE IF NOT EXISTS contacts (
+  id CHAR(36) PRIMARY KEY,
+  name VARCHAR(100),
+  subject VARCHAR(200),
+  email VARCHAR(191),
+  description TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Carts (stored as JSON for simplicity)
+CREATE TABLE IF NOT EXISTS carts (
+  user_email VARCHAR(191) PRIMARY KEY,
+  items_json JSON NOT NULL,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- Orders
+CREATE TABLE IF NOT EXISTS orders (
+  id CHAR(36) PRIMARY KEY,
+  email VARCHAR(191) NOT NULL,
+  name VARCHAR(100) NOT NULL,
+  address VARCHAR(255) NOT NULL,
+  items_json JSON NOT NULL,
+  subtotal DECIMAL(10,2) NOT NULL,
+  fee DECIMAL(10,2) NOT NULL,
+  total DECIMAL(10,2) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
