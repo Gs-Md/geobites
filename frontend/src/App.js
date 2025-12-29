@@ -18,7 +18,7 @@ function App() {
   const [currentUser, setCurrentUser] = useState(null);
 
   useEffect(() => {
-    // Check server for current user session
+    
     (async () => {
       const u = await getCurrentUser();
       if (u) {
@@ -26,7 +26,7 @@ function App() {
         setIsLoggedIn(true);
         setIsOwner(u.role === "owner");
 
-        // load server-side cart
+        
         try {
           const r = await fetch(`${API_BASE}/api/cart`, {
             credentials: "include",
@@ -36,7 +36,7 @@ function App() {
             setCart(Array.isArray(cartData) ? cartData : []);
           }
         } catch (e) {
-          // ignore
+          
         }
       } else {
         setIsLoggedIn(false);
@@ -46,7 +46,6 @@ function App() {
     })();
   }, []);
 
-  // Persist cart for the current user (server-backed)
   useEffect(() => {
     if (currentUser && currentUser.email) {
       (async () => {
@@ -58,7 +57,6 @@ function App() {
             body: JSON.stringify(cart),
           });
         } catch (e) {
-          // ignore
         }
       })();
     }
@@ -79,7 +77,6 @@ function App() {
     setIsLoggedIn(true);
     setIsOwner(user?.role === "owner");
 
-    // load cart for this user after login
     (async () => {
       try {
         const r = await fetch(`${API_BASE}/api/cart`, {
@@ -90,7 +87,7 @@ function App() {
           setCart(Array.isArray(cartData) ? cartData : []);
         }
       } catch (e) {
-        // ignore
+        
       }
     })();
   };
@@ -99,7 +96,7 @@ function App() {
     try {
       await authLogout();
     } catch (e) {
-      // ignore
+      
     }
     setCurrentUser(null);
     setIsLoggedIn(false);

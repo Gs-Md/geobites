@@ -16,7 +16,6 @@ const CheckoutModal = ({ cart = [], subtotal = 0, currentUser, onClose, onPlaced
     setLoading(true);
 
     try {
-      // ✅ Send only fields backend needs; backend recalculates totals now
       const res = await fetch(`${API_BASE}/api/orders`, {
         method: "POST",
         credentials: "include",
@@ -31,7 +30,6 @@ const CheckoutModal = ({ cart = [], subtotal = 0, currentUser, onClose, onPlaced
       const d = await res.json();
       if (!res.ok) throw new Error(d.message || "Order failed");
 
-      // clear server cart
       await fetch(`${API_BASE}/api/cart`, {
         method: "POST",
         credentials: "include",

@@ -22,7 +22,7 @@ const {
 
 const app = express();
 
-/* ============ Config ============ */
+//Config
 const PORT = Number(process.env.PORT) || 4000;
 const IS_PROD = process.env.NODE_ENV === "production";
 
@@ -31,11 +31,7 @@ const OWNER_EMAIL = process.env.OWNER_EMAIL || "owner@test.com";
 const OWNER_PASSWORD = process.env.OWNER_PASSWORD || "123456";
 const CORS_ORIGIN = process.env.CORS_ORIGIN || "http://localhost:3000";
 
-/**
- * IMPORTANT:
- * - For localhost testing: sameSite="lax", secure=false
- * - For production HTTPS: sameSite="none", secure=true
- */
+
 const COOKIE_BASE = {
   httpOnly: true,
   sameSite: IS_PROD ? "none" : "lax",
@@ -43,7 +39,7 @@ const COOKIE_BASE = {
   maxAge: 7 * 24 * 60 * 60 * 1000,
 };
 
-/* ============ Middleware (ORDER MATTERS) ============ */
+//Middleware
 app.use(express.json());
 app.use(cookieParser());
 
@@ -56,7 +52,7 @@ app.use(
   })
 );
 
-/* ============ Auth helpers ============ */
+//Auth helpers
 function requireAuth(req, res, next) {
   const token = req.cookies?.token;
   if (!token) return res.status(401).json({ message: "Unauthorized" });
@@ -85,7 +81,7 @@ function requireOwner(req, res, next) {
   }
 }
 
-/* ============ Health ============ */
+//Health
 app.get("/health", (_req, res) => res.json({ ok: true }));
 
 app.get("/api/health", async (_req, res) => {
@@ -97,7 +93,7 @@ app.get("/api/health", async (_req, res) => {
   }
 });
 
-/* ============ Auth routes ============ */
+//Auth routes
 app.post("/api/auth/login", async (req, res) => {
   const { email, password } = req.body || {};
   if (typeof email !== "string" || typeof password !== "string") {
@@ -194,7 +190,7 @@ app.get("/api/auth/me", (req, res) => {
   }
 });
 
-/* ============ CART (DB) ============ */
+//CART
 app.post("/api/cart", requireAuth, async (req, res) => {
   try {
     const items = Array.isArray(req.body) ? req.body : [];
@@ -216,7 +212,7 @@ app.get("/api/cart", requireAuth, async (req, res) => {
   }
 });
 
-/* ============ ORDERS (DB) ============ */
+//ORDERS
 app.post("/api/orders", requireAuth, async (req, res) => {
   try {
     const { name = "", address = "" } = req.body || {};
@@ -224,13 +220,11 @@ app.post("/api/orders", requireAuth, async (req, res) => {
       return res.status(400).json({ message: "Missing order fields" });
     }
 
-    // ✅ Read items from DB cart
     const cartItems = await dbGetCartByEmail(req.user.email);
     if (!Array.isArray(cartItems) || cartItems.length === 0) {
       return res.status(400).json({ message: "Cart is empty" });
     }
 
-    // sanitize
     const safeItems = cartItems
       .map((it) => ({
         id: String(it.id || ""),
@@ -248,7 +242,6 @@ app.post("/api/orders", requireAuth, async (req, res) => {
     const fee = 3;
     const total = subtotal + fee;
 
-    // ✅ Create order header
     const orderId = await dbCreateOrder({
       email: req.user.email,
       customerName: String(name).trim(),
@@ -258,7 +251,6 @@ app.post("/api/orders", requireAuth, async (req, res) => {
       total: Number(total.toFixed(2)),
     });
 
-    // ✅ Create order items (NO uuid for id)
     for (const it of safeItems) {
       await dbCreateOrderItem({
         orderId,
@@ -269,7 +261,6 @@ app.post("/api/orders", requireAuth, async (req, res) => {
       });
     }
 
-    // ✅ Clear cart after order
     await dbUpsertCart(req.user.email, []);
 
     return res.json({ ok: true, orderId });
@@ -289,7 +280,7 @@ app.get("/api/orders", requireOwner, async (_req, res) => {
   }
 });
 
-/* ============ CONTACTS (DB) ============ */
+//CONTACTS
 app.post("/api/contact", async (req, res) => {
   const { name = "", subject = "", email = "", description = "" } = req.body || {};
   if (!name && !email && !subject && !description) {
@@ -332,7 +323,7 @@ app.delete("/api/contact/:id", requireOwner, async (req, res) => {
   }
 });
 
-/* ============ Start ============ */
+//Start
 app.listen(PORT, () => {
   console.log(`✅ API running on port ${PORT}`);
 });

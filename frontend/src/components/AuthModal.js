@@ -48,7 +48,7 @@ const AuthModal = ({ onClose, onLoginSuccess }) => {
   const onSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    // basic validations
+    
     if (activeTab === "signup") {
       if (formData.password !== formData.confirm) {
         return setError("Passwords do not match");
@@ -68,7 +68,6 @@ const AuthModal = ({ onClose, onLoginSuccess }) => {
       return;
     }
 
-    // login flow
     try {
       const user = await login({
         email: formData.email,

@@ -1,4 +1,3 @@
-// initDb.js
 const { pool } = require("./db");
 
 async function initDb() {

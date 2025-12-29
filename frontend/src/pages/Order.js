@@ -83,7 +83,7 @@ const Order = ({ cart, incQty, decQty, removeItem, currentUser, onClearCart }) =
             onPlaced={(orderId) => {
               setPlacedId(orderId);
               setShowCheckout(false);
-              // clear cart locally
+              
               onClearCart && onClearCart();
             }}
           />

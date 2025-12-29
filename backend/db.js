@@ -1,4 +1,3 @@
-// db.js
 const mysql = require("mysql2/promise");
 const { randomUUID } = require("crypto");
 
@@ -17,7 +16,7 @@ async function testDb() {
   return rows[0]?.ok === 1;
 }
 
-/* ===================== USERS ===================== */
+//USERS
 async function dbFindUserByEmail(email) {
   const [rows] = await pool.query(
     "SELECT id, email, name, password_hash FROM users WHERE email = ? LIMIT 1",
@@ -35,7 +34,7 @@ async function dbCreateUser({ name, email, passwordHash }) {
   return u ? { email: u.email, name: u.name } : { email, name };
 }
 
-/* ===================== CONTACTS ===================== */
+//CONTACTS
 async function dbCreateContact({ name, subject, email, description }) {
   const id = randomUUID();
   await pool.execute(
@@ -58,7 +57,7 @@ async function dbDeleteContact(id) {
   return result.affectedRows > 0;
 }
 
-/* ===================== CARTS (JSON in DB) ===================== */
+//Carts
 async function dbGetCartByEmail(email) {
   const [rows] = await pool.query(
     "SELECT cart_json FROM carts WHERE email = ? LIMIT 1",
@@ -69,13 +68,10 @@ async function dbGetCartByEmail(email) {
 
   const v = rows[0].cart_json;
 
-  // If MySQL JSON column returns parsed object/array
   if (Array.isArray(v)) return v;
 
-  // If it returns object but not array
   if (v && typeof v === "object") return [];
 
-  // If it returns string
   if (typeof v === "string") {
     try {
       const parsed = JSON.parse(v || "[]");
@@ -103,7 +99,7 @@ async function dbUpsertCart(email, cartArray) {
   return true;
 }
 
-/* ===================== ORDERS ===================== */
+//ORDERS 
 async function dbCreateOrder({ email, customerName, address, subtotal, fee, total }) {
   const id = randomUUID();
 

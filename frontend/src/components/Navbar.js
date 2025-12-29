@@ -14,7 +14,7 @@ const Navbar = ({ cartCount = 0, isLoggedIn, setIsLoggedIn, isOwner, setIsOwner,
 
   const handleAuthClick = async () => {
     if (isLoggedIn) {
-      // prefer caller-provided logout handler (App), otherwise call demo server endpoint
+      
       if (onLogout) {
         onLogout();
       } else {
@@ -25,7 +25,7 @@ const Navbar = ({ cartCount = 0, isLoggedIn, setIsLoggedIn, isOwner, setIsOwner,
             credentials: "include",
           });
         } catch (e) {
-          // ignore network errors in demo
+          
         }
         setIsLoggedIn(false);
         setIsOwner(false);
@@ -74,7 +74,7 @@ const Navbar = ({ cartCount = 0, isLoggedIn, setIsLoggedIn, isOwner, setIsOwner,
             if (onLoginSuccess) {
               onLoginSuccess(user);
             } else {
-              // After login, App will set flags via /auth/me, but set now for snappier UI:
+              
               setIsLoggedIn(true);
               setIsOwner(true);
             }

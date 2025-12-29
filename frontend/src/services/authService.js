@@ -24,7 +24,7 @@ export async function signup({ name, email, password }) {
     throw new Error(d.message || "Signup failed");
   }
 
-  // backend now returns { ok, user }
+  
   return d.user;
 }
 
@@ -42,7 +42,7 @@ export async function login({ email, password }) {
     throw new Error(d.message || "Login failed");
   }
 
-  // backend now returns { ok, user }
+  
   return d.user;
 }
 
@@ -53,7 +53,7 @@ export async function logout() {
       credentials: "include",
     });
   } catch {
-    // ignore
+    
   }
 }
 
