@@ -1,91 +1,118 @@
-#  GeoBites – ReactJS Responsive Food Website
+# GeoBites – CSCI426 Advanced Web Programming Project
 
-GeoBites is a modern, fully responsive ReactJS food website designed as a university project.  
-The platform showcases a food menu, ordering interface, contact page, and clean navigation.
+   ## Project Description
 
-This project focuses on frontend functionality only, built with React, components, routing, and responsive UI.
+      GeoBites is a full-stack web application developed as part of CSCI426: Advanced Web Programming.
+      The project implements a functional backend using Node.js and MySQL, integrated with a ReactJS frontend to deliver a complete client–server web application.
 
-## Live Demo:
-The Website is fully deployed and accessible here:
-https://geobites.vercel.app/
+      The system allows users to register, log in, interact with the platform, and submit messages, while the owner (admin) can securely manage received messages through a protected inbox.
 
-##  Features:
-###  Fully Responsive UI  
-Works on mobile, tablet, and desktop.
+   ## Live Deployment
 
-###  6 Pages  
-- Home  
-- About  
-- Menu (Services / Features)  
-- Order (Dynamic Cart)  
-- Contact  
-- Inbox (Demo admin page)
+      The application is deployed and accessible online:
+         •	Frontend: https://geobites.vercel.app
+         •	Backend: https://geobites.onrender.com
 
-###  Frontend Functionalities
-- Dynamic menu categories  
-- Add to cart / Edit cart quantity  
-- Contact form UI  
-- Simple login modal (demo frontend component)  
-- Owner “Messages” page layout (UI only)  
-- Clean navigation bar + footer  
-- Styled using custom CSS  
+   ## Core Features
 
-###  Technologies Used
-- ReactJS
-- React Router
-- CSS3
-- MUI Icons
-- Modern component-based structure
+   ### Backend Functionality
+      •	User Signup & Login (JWT authentication)
+      •	Secure password hashing
+      •	CRUD operations on database entities
+      •	Owner-only admin inbox (messages management)
+      •	Input validation and error handling
 
----
+   ### Frontend Functionality
+      •	Fully responsive UI (mobile, tablet, desktop)
+      •	Dynamic pages and routing
+      •	Contact form connected to backend
+      •	Cart and order interface
+      •	Clean navigation and layout
 
-## Project Structure:
-geobites/
-│
-├── src/
-│   ├── components/      # Navbar, Footer, AuthModal
-│   ├── pages/           # Home, About, Menu, Order, Contact, Inbox
-│   ├── data/            # MenuData.js
-│   ├── assets/          # Images
-│   ├── styles/          # CSS files
-│   ├── App.js
-│   └── index.js
-│
-└── README.md
+   ## Database Design
+      The database uses MySQL and includes multiple related entities:
+         •	Users
+         •	Contacts / Messages
 
-##  How to Run the Project:
+      Relationships are implemented to ensure data integrity and proper backend functionality.
 
-1. Clone the repository:
-   git clone https://github.com/Gs-Md/geobites
+   ## Technologies Used
+   ### Backend
+      •	Node.js
+      •	Express.js
+      •	MySQL
+      •	JSON Web Tokens (JWT)
+      •	bcrypt
 
-2. Install dependencies:
-   npm install
+   ### Frontend
+      •	ReactJS
+      •	React Router
+      •	CSS3
+      •	MUI Icons
 
-3. Run the development server:
-   npm start
+   ### Tools & Deployment
+      •	Git & GitHub
+      •	Render (backend deployment)
+      •	Vercel (frontend deployment)
 
-The project will run on:
-http://localhost:3000
+   ## Project Structure
+      geobites/
+      │
+      ├── backend/             # Node.js + Express backend
+      ├── frontend/            # ReactJS frontend
+      ├── database/            # MySQL schema / queries
+      ├── screenshots/         # UI screenshots
+      └── README.md
 
-##  Screenshots:
+   ## How to run the project locally
+   ### Backend:
+      cd backend
+      node server.js
 
-### Home Page
-![Home](./screenshots/home.png)
+   ### Create .env file with:
+      PORT=4000
+      DB_HOST=localhost
+      DB_USER=your_user
+      DB_PASSWORD=your_password
+      DB_NAME=geobites
+      JWT_SECRET=your_secret
 
-### About Page
-![About](./screenshots/about.png)
+   ### Frontend:
+      cd frontend
+      npm install
+      npm start
 
-### Menu Page
-![Menu](./screenshots/menu.png)
+   ### The application will run on:
+      •	Frontend: http://localhost:3000
+      •	Backend: http://localhost:4000
 
-### Order Page
-![Order](./screenshots/order.png)
+   ## Screenshots
 
-### Contact Page
-![Contact](./screenshots/contact.png)
+   ### Home Page
+   ![Home](./screenshots/home.png)
 
-### Cart(Order) Page
-![Cart(Order)](./screenshots/cart(order).png)
+   ### About Page
+   ![About](./screenshots/about.png)
 
-### Login-Signup
-![Login-Signup](./screenshots/login-Signup.png)
+   ### Menu Page
+   ![Menu](./screenshots/menu.png)
+
+   ### Order Page
+   ![Order](./screenshots/order.png)
+
+   ### Cart (Order)
+   ![Cart](./screenshots/cart(order).png)
+
+   ### Contact Page
+   ![Contact](./screenshots/contact.png)
+
+   ### Login / Signup
+   ![Login-Signup](./screenshots/login-Signup.png)
+
+   ### Owner Inbox (Admin Panel)
+   ![Inbox](./screenshots/inbox.png)
+
+# Conclusion & Future Scope
+
+This project demonstrates backend development, database integration, authentication, and deployment using modern web technologies.
+Future enhancements may include email notifications, role-based access control, and improved administrative features.
