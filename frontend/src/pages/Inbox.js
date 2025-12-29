@@ -84,7 +84,7 @@ const Inbox = () => {
                 </div>
                 <div className="inbox-date">
                   {m.created_at
-                    ? new Date(m.created-at).toLocaleString()
+                    ? new Date(m.created_at).toLocaleString()
                     : "No date"}
                 </div>
               </div>
