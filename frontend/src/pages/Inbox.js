@@ -83,8 +83,8 @@ const Inbox = () => {
                   {m.email || "No email"}
                 </div>
                 <div className="inbox-date">
-                  {m.createdAt
-                    ? new Date(m.createdAt).toLocaleString()
+                  {m.created_at
+                    ? new Date(m.created-at).toLocaleString()
                     : "No date"}
                 </div>
               </div>
